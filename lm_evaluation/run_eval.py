@@ -62,15 +62,26 @@ def main():
         models.append((model_name, revision))
         
     model = make_model(provider, models)
+    model_name = '__'.join([name.split('/')[-1] for name in args.models])
+    os.makedirs(
+        os.path.join(
+            results_dir,
+            model_name.replace('/', '_')
+        ),
+        exist_ok=True
+    )
     for task in tasks:
-        results_file = os.path.join(results_dir,
-            f"{provider}.{model_name.replace('/', '_')}.{task}.json")
+        results_file = os.path.join(
+            results_dir,
+            model_name.replace('/', '_'),
+            f"{task}.json"
+        )
         result = None
-        # try:
-        #     # Load existing result if found
-        #     result = load_json(results_file)
-        # except:
-        #     result = None
+        try:
+            # Load existing result if found
+            result = load_json(results_file)
+        except:
+            result = None
         if result is None:
             print(f"Running {task} on {model_name}")
             result = run_evaluation(task, model)
